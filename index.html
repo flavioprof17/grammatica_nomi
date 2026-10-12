@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ripasso: il nome</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f4fb;
+  --card:#ffffff;
+  --ink:#2d2a3e;
+  --muted:#6b6880;
+  --line:#e6e2f0;
+  --lav:#e4dcf7;   --lav-d:#7d63c4;
+  --pink:#fbe0ea;  --pink-d:#c45a82;
+  --blue:#dcecfb;  --blue-d:#3f7fbf;
+  --mint:#d9f2e3;  --mint-d:#2f8f5b;
+  --peach:#fde6d3; --peach-d:#c2703a;
+  --lemon:#fbf3cc; --lemon-d:#9a7d12;
+  --ok-bg:#e3f6ea; --ok:#2f8f5b;
+  --ko-bg:#fde8e8; --ko:#c0474b;
+  --shadow:0 2px 10px rgba(60,40,120,.07);
+  --r:16px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Lexend",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:17px;line-height:1.55;
+}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px 48px}
+header.top{
+  background:linear-gradient(135deg,var(--lav) 0%,var(--blue) 55%,var(--mint) 100%);
+  padding:28px 16px 24px;margin-bottom:20px;
+}
+header.top .inner{max-width:880px;margin:0 auto;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+h1{margin:0;font-size:1.65rem;font-weight:700;letter-spacing:-.01em}
+.sub{margin:4px 0 0;color:#4a4663;font-size:.98rem}
+.scorebox{background:rgba(255,255,255,.75);border-radius:14px;padding:10px 16px;text-align:center;min-width:150px}
+.scorebox b{font-size:1.35rem;display:block}
+.scorebox span{font-size:.82rem;color:var(--muted)}
+
+nav.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+nav.tabs button{
+  font:inherit;font-size:.88rem;border:2px solid transparent;border-radius:14px;cursor:pointer;
+  padding:12px 8px;background:var(--card);color:var(--ink);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;line-height:1.25;
+}
+nav.tabs button .n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.95rem}
+nav.tabs button[aria-selected="true"]{border-color:var(--lav-d)}
+nav.tabs button:focus-visible{outline:3px solid var(--lav-d);outline-offset:2px}
+button,select,summary{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.c1{background:var(--lav)}.c2{background:var(--pink)}.c3{background:var(--blue)}.c4{background:var(--peach)}.c5{background:var(--mint)}
+
+section.panel{display:none}
+section.panel.active{display:block}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:22px;margin-bottom:16px}
+.card h2{margin:0 0 6px;font-size:1.3rem}
+.lead{color:var(--muted);margin:0 0 12px}
+
+details.rule{background:var(--lemon);border-radius:12px;padding:12px 16px;margin-top:8px}
+details.rule summary{cursor:pointer;font-weight:600;color:#6e5a0c}
+details.rule ul{margin:10px 0 2px;padding-left:20px}
+details.rule li{margin:4px 0}
+details.rule p{margin:8px 0}
+
+.progress{display:flex;gap:6px;margin:0 0 14px;flex-wrap:wrap}
+.progress i{width:26px;height:8px;border-radius:5px;background:var(--line)}
+.progress i.ok{background:var(--ok)}.progress i.ko{background:var(--ko)}.progress i.cur{background:var(--lav-d)}
+.qcount{font-size:.85rem;color:var(--muted);margin-bottom:4px}
+.question{font-size:1.2rem;font-weight:600;margin:0 0 16px}
+.question q{quotes:"«" "»";color:var(--lav-d)}
+.opts{display:grid;gap:10px}
+.opt{
+  font:inherit;text-align:left;padding:13px 16px;border-radius:12px;border:2px solid var(--line);
+  background:#fff;cursor:pointer;display:flex;gap:12px;align-items:center;color:var(--ink);
+}
+.opt:hover:not(:disabled){border-color:var(--lav-d);background:#faf8ff}
+.opt .L{flex:0 0 30px;height:30px;border-radius:8px;background:var(--lav);display:grid;place-items:center;font-weight:700;font-size:.9rem}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-bg)}
+.opt.right .L{background:var(--ok);color:#fff}
+.opt.wrong{border-color:var(--ko);background:var(--ko-bg)}
+.opt.wrong .L{background:var(--ko);color:#fff}
+
+.fb{border-radius:12px;padding:14px 16px;margin-top:14px;border-left:6px solid}
+.fb.ok{background:var(--ok-bg);border-color:var(--ok)}
+.fb.ko{background:var(--ko-bg);border-color:var(--ko)}
+.fb p{margin:6px 0}
+.fb .head{font-weight:700}
+.fb.ok .head{color:var(--ok)}.fb.ko .head{color:var(--ko)}
+.fb .whynot{background:rgba(255,255,255,.7);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:.95rem}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn{
+  font:inherit;font-weight:600;border:none;border-radius:12px;padding:12px 20px;cursor:pointer;
+  background:var(--lav-d);color:#fff;
+}
+.btn:hover{filter:brightness(1.07)}
+.btn.soft{background:var(--lav);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.opt:focus-visible,.pill:focus-visible,select:focus-visible{outline:3px solid var(--lav-d);outline-offset:2px}
+
+/* esercizi a righe */
+.rows{display:grid;gap:10px}
+.row{border:2px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff}
+.row .top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.row .word{font-weight:600;font-size:1.12rem}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{
+  font:inherit;font-size:.9rem;padding:9px 16px;min-height:44px;border-radius:999px;border:2px solid var(--line);
+  background:#fff;cursor:pointer;color:var(--ink);
+}
+.pill:hover:not(:disabled){border-color:var(--lav-d)}
+.pill.sel{background:var(--lav);border-color:var(--lav-d);font-weight:600}
+.pill:disabled{cursor:default}
+.row.ok{border-color:var(--ok);background:var(--ok-bg)}
+.row.ko{border-color:var(--ko);background:var(--ko-bg)}
+.row .exp{margin-top:10px;font-size:.95rem;display:none}
+.row.ok .exp,.row.ko .exp{display:block}
+.row .exp .whynot{background:rgba(255,255,255,.75);border-radius:8px;padding:7px 10px;margin-top:6px}
+.badge{font-size:.78rem;font-weight:700;padding:3px 9px;border-radius:999px;color:#fff;margin-right:6px}
+.badge.ok{background:var(--ok)}.badge.ko{background:var(--ko)}
+
+.result{border-radius:14px;padding:16px 18px;margin-top:16px;background:var(--blue);display:none}
+.result.show{display:block}
+.result b{font-size:1.2rem}
+
+/* analisi grammaticale */
+.sentence{border:2px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;background:#fff}
+.sentence .text{font-size:1.15rem;font-weight:600;margin-bottom:12px;color:var(--lav-d)}
+.tokens{display:flex;flex-wrap:wrap;gap:10px}
+.tok{display:flex;flex-direction:column;gap:6px;background:#faf8ff;border:2px solid var(--line);border-radius:12px;padding:8px 10px;min-width:118px}
+.tok .w{font-weight:700;font-size:1.05rem;text-align:center}
+.tok select{font:inherit;font-size:16px;min-height:40px;padding:6px 8px;border-radius:8px;border:1.5px solid #cfc8e3;background:#fff;color:var(--ink)}
+.tok.ok{border-color:var(--ok);background:var(--ok-bg)}
+.tok.ko{border-color:var(--ko);background:var(--ko-bg)}
+.anal{margin-top:14px;display:none}
+.anal.show{display:block}
+.anal table{width:100%;border-collapse:collapse;font-size:.93rem}
+.anal td{padding:8px 8px;border-top:1px solid var(--line);vertical-align:top}
+.anal td:first-child{font-weight:700;white-space:nowrap;width:1%}
+.anal tr.ko td{background:var(--ko-bg)}
+.anal .tip{display:block;margin-top:4px;color:#7a3337}
+.anal .tipok{display:block;margin-top:4px;color:var(--muted)}
+
+footer{color:var(--muted);font-size:.82rem;text-align:center;margin-top:24px}
+
+/* tablet e telefono: barra delle schede compatta che resta in alto */
+@media (max-width:820px){
+  body{font-size:16px}
+  header.top{padding:18px 16px 16px;margin-bottom:0}
+  header.top .inner{flex-wrap:nowrap;align-items:center}
+  h1{font-size:1.3rem}
+  .sub{font-size:.88rem}
+  .scorebox{min-width:0;padding:8px 12px;flex:0 0 auto}
+  .scorebox b{font-size:1.1rem}
+  .scorebox span{font-size:.7rem;display:block;max-width:90px;line-height:1.2}
+  nav.tabs{
+    display:flex;overflow-x:auto;gap:8px;position:sticky;top:0;z-index:10;
+    margin:0 -16px 16px;padding:10px 16px;background:var(--bg);
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;
+  }
+  nav.tabs::-webkit-scrollbar{display:none}
+  nav.tabs button{
+    flex:0 0 auto;flex-direction:row;gap:8px;padding:8px 14px 8px 8px;border-radius:999px;
+    font-size:.9rem;white-space:nowrap;scroll-snap-align:start;min-height:44px;
+  }
+  nav.tabs button .n{width:28px;height:28px}
+  .card{padding:16px}
+  .question{font-size:1.1rem}
+  .tok{min-width:calc(50% - 5px);flex:1 1 calc(50% - 5px)}
+  .anal td:first-child{white-space:normal}
+  .anal tr{display:block;border-top:1px solid var(--line)}
+  .anal td{display:block;border-top:none;padding:4px 10px}
+  .anal td:first-child{width:auto;padding-top:10px;font-size:1.02rem}
+  .anal td:last-child{padding-bottom:10px}
+  .actions .btn{flex:1 1 auto;min-height:48px}
+}
+@media (min-width:600px) and (max-width:820px){
+  .tok{min-width:calc(33.33% - 7px);flex:1 1 calc(33.33% - 7px)}
+}
+@media (max-width:380px){
+  .sub{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="inner">
+    <div>
+      <h1>Ripasso di grammatica: il nome</h1>
+      <p class="sub">Esercitati con esempi sempre nuovi. Se sbagli, leggi la spiegazione!</p>
+    </div>
+    <div class="scorebox" aria-live="polite">
+      <b id="gScore">0 / 0</b>
+      <span>risposte giuste in questa sessione</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="p1"><span class="n c1">1</span>Tipi di nomi</button>
+    <button role="tab" aria-selected="false" data-tab="p2"><span class="n c2">2</span>Composti, collettivi, comuni</button>
+    <button role="tab" aria-selected="false" data-tab="p3"><span class="n c3">3</span>Primitivi o derivati</button>
+    <button role="tab" aria-selected="false" data-tab="p4"><span class="n c4">4</span>Falsi alterati</button>
+    <button role="tab" aria-selected="false" data-tab="p5"><span class="n c5">5</span>Analisi grammaticale</button>
+  </nav>
+
+  <!-- 1. QUIZ -->
+  <section class="panel active" id="p1">
+    <div class="card">
+      <h2>1. Riconosci il tipo di nome</h2>
+      <p class="lead">Scegli la risposta giusta tra le quattro. Dopo ogni risposta trovi la spiegazione.</p>
+      <details class="rule">
+        <summary>📒 Ripassa la regola</summary>
+        <ul>
+          <li><b>Mobile</b>: forma il femminile cambiando la parte finale della stessa parola (attore → attrice, leone → leonessa, re → regina).</li>
+          <li><b>Indipendente</b>: maschile e femminile sono due parole completamente diverse (padre → madre, bue → mucca).</li>
+          <li><b>Di genere comune</b>: una sola forma per maschio e femmina, cambia solo l’articolo (il nipote / la nipote).</li>
+          <li><b>Promiscuo</b>: nomi di animali con una sola forma e un solo articolo; si aggiunge «maschio» o «femmina» (la giraffa maschio).</li>
+          <li><b>Invariabile</b>: stessa forma al singolare e al plurale (la crisi → le crisi).</li>
+          <li><b>Sovrabbondante</b>: ha due plurali, spesso con significati diversi (i bracci / le braccia).</li>
+          <li><b>Difettivo del singolare</b>: <u>manca il singolare</u>, esiste solo al plurale (le forbici).</li>
+          <li><b>Difettivo del plurale</b>: <u>manca il plurale</u>, esiste solo al singolare (la sete).</li>
+        </ul>
+        <p>💡 Trucco: «difettivo» vuol dire «che manca di qualcosa». <i>Difettivo del singolare</i> = gli manca il singolare.</p>
+      </details>
+    </div>
+    <div class="card" id="quiz"></div>
+  </section>
+
+  <!-- 2. CLASSIFICA -->
+  <section class="panel" id="p2">
+    <div class="card">
+      <h2>2. Composti, collettivi o di genere comune?</h2>
+      <p class="lead">Per ogni nome scegli la categoria giusta, poi premi «Controlla».</p>
+      <details class="rule">
+        <summary>📒 Ripassa la regola</summary>
+        <ul>
+          <li><b>Composto</b>: è formato da due parole unite insieme (capo + stazione = capostazione; attacca + panni = attaccapanni).</li>
+          <li><b>Collettivo</b>: anche se è singolare, indica un <u>gruppo</u> di persone, animali o cose (orchestra = gruppo di musicisti; arcipelago = gruppo di isole).</li>
+          <li><b>Di genere comune</b>: ha la stessa forma al maschile e al femminile, cambia solo l’articolo (il custode / la custode).</li>
+        </ul>
+      </details>
+    </div>
+    <div class="card" id="ex2"></div>
+  </section>
+
+  <!-- 3. PRIMITIVI / DERIVATI -->
+  <section class="panel" id="p3">
+    <div class="card">
+      <h2>3. Primitivo o derivato?</h2>
+      <p class="lead">Decidi se ogni nome è primitivo o derivato, poi premi «Controlla».</p>
+      <details class="rule">
+        <summary>📒 Ripassa la regola</summary>
+        <ul>
+          <li><b>Primitivo</b>: non deriva da nessun’altra parola italiana; è la «base» (pane, carta, festa).</li>
+          <li><b>Derivato</b>: nasce da un’altra parola a cui si aggiunge un <u>suffisso</u> che cambia il significato: libro + <b>-eria</b> = libreria; giornale + <b>-aio</b> = giornalaio.</li>
+          <li>Suffissi frequenti: <b>-aio</b>, <b>-eria</b>, <b>-ista</b>, <b>-iere</b>, <b>-ata</b>, <b>-ificio</b>.</li>
+        </ul>
+        <p>💡 Chiediti: «Riesco a trovare dentro questa parola un’altra parola più semplice da cui nasce?» Se sì, è derivato.</p>
+      </details>
+    </div>
+    <div class="card" id="ex3"></div>
+  </section>
+
+  <!-- 4. FALSI ALTERATI -->
+  <section class="panel" id="p4">
+    <div class="card">
+      <h2>4. Vero o falso alterato?</h2>
+      <p class="lead">Per ogni nome decidi se è un vero alterato o un falso alterato, poi premi «Controlla».</p>
+      <details class="rule">
+        <summary>📒 Ripassa la regola</summary>
+        <ul>
+          <li><b>Vero alterato</b>: cambia il nome di partenza solo nella grandezza o nel giudizio: gatto → gatt<b>ino</b> (piccolo), naso → nas<b>one</b> (grande), ragazzo → ragazz<b>accio</b> (cattivo).</li>
+          <li><b>Falso alterato</b>: sembra un alterato perché finisce in -ino, -one, -ello, -etto, -uzzo…, ma ha un significato <u>completamente diverso</u>: il <i>torrone</i> non è una torre grande, è un dolce!</li>
+        </ul>
+        <p>💡 Prova a dire: «Un ___ è un piccolo/grande/brutto ___?» Se la frase non ha senso, è un falso alterato.</p>
+      </details>
+    </div>
+    <div class="card" id="ex4"></div>
+  </section>
+
+  <!-- 5. ANALISI -->
+  <section class="panel" id="p5">
+    <div class="card">
+      <h2>5. Analisi grammaticale</h2>
+      <p class="lead">Sotto ogni parola scegli la parte del discorso. Dopo il controllo trovi l’analisi completa di ogni parola.</p>
+      <details class="rule">
+        <summary>📒 Ripassa la regola</summary>
+        <ul>
+          <li><b>Articolo</b>: sta davanti al nome (il, lo, la, i, gli, le; un, uno, una).</li>
+          <li><b>Nome</b>: indica persone, animali, cose, idee.</li>
+          <li><b>Aggettivo</b>: <u>accompagna</u> un nome (la <b>mia</b> auto, <b>questa</b> canzone, auto <b>vecchia</b>).</li>
+          <li><b>Pronome</b>: <u>sostituisce</u> un nome (la tua auto e la <b>mia</b> → «mia» sta al posto di «mia auto»).</li>
+          <li><b>Verbo</b>: indica un’azione o uno stato. I tempi composti sono un solo verbo: <b>ho ascoltato</b>.</li>
+          <li><b>Avverbio</b>: modifica un verbo o un aggettivo (non, sempre, ieri, molto…).</li>
+          <li><b>Preposizione</b>: semplice (di, a, da, in, con, su, per, tra, fra) o articolata (del, della, sul…).</li>
+          <li><b>Congiunzione</b>: unisce parole o frasi (e, ma, o, però…).</li>
+        </ul>
+        <p>💡 Mio, tuo, questo, quello… sono <b>aggettivi</b> se accompagnano un nome, <b>pronomi</b> se lo sostituiscono.</p>
+      </details>
+    </div>
+    <div class="card" id="ex5"></div>
+  </section>
+
+  <footer>Ripasso per la classe prima · Gli esempi cambiano ogni volta che premi «Nuovi esempi», «Nuove domande» o «Nuove frasi».</footer>
+</div>
+
+<script>
+/* ---------- utilità ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const sample = (a, n) => shuffle(a).slice(0, n);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* ---------- punteggio globale ---------- */
+const score = { ok: 0, tot: 0 };
+function addScore(ok, tot) {
+  score.ok += ok; score.tot += tot;
+  $('#gScore').textContent = `${score.ok} / ${score.tot}`;
+}
+function praise(ok, tot) {
+  const p = ok / tot;
+  if (p === 1) return '🌟 Perfetto! Hai risposto bene a tutto.';
+  if (p >= 0.8) return '👏 Ottimo lavoro! Rileggi le spiegazioni degli errori.';
+  if (p >= 0.6) return '🙂 Buon risultato. Rileggi la regola e riprova con nuovi esempi.';
+  return '💪 Non scoraggiarti: apri «Ripassa la regola», leggi le spiegazioni e riprova.';
+}
+
+/* ---------- schede ---------- */
+document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('nav.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+  document.querySelectorAll('section.panel').forEach(p => p.classList.toggle('active', p.id === b.dataset.tab));
+  b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+  const nav = $('nav.tabs');
+  const sticky = getComputedStyle(nav).position === 'sticky';
+  const target = sticky ? $('.wrap').offsetTop : 0;
+  if (window.scrollY > target) window.scrollTo({ top: target, behavior: 'smooth' });
+}));
+
+/* =========================================================
+   1. QUIZ SUI TIPI DI NOMI
+   ========================================================= */
+const CATS = {
+  promiscuo: {
+    nome: 'nome promiscuo', label: 'Nome promiscuo', pl: 'Nomi promiscui',
+    def: 'indica un animale con un’unica forma e un unico articolo sia per il maschio sia per la femmina; per distinguerli si aggiunge «maschio» o «femmina»',
+    conf: ['comune', 'mobile', 'indipendente', 'invariabile'],
+    d: it => `Si dice «${it.a}${it.w} maschio» e «${it.a}${it.w} femmina».`,
+    items: [
+      { w: 'giraffa', a: 'la ' }, { w: 'balena', a: 'la ' }, { w: 'volpe', a: 'la ' }, { w: 'pantera', a: 'la ' },
+      { w: 'zebra', a: 'la ' }, { w: 'falco', a: 'il ' }, { w: 'scoiattolo', a: 'lo ' }, { w: 'delfino', a: 'il ' },
+      { w: 'rondine', a: 'la ' }, { w: 'squalo', a: 'lo ' }, { w: 'farfalla', a: 'la ' }, { w: 'ippopotamo', a: 'l’' }
+    ]
+  },
+  sovrabbondante: {
+    nome: 'nome sovrabbondante', label: 'Nome sovrabbondante', pl: 'Nomi sovrabbondanti',
+    def: 'ha due forme diverse al plurale, spesso con significati diversi',
+    conf: ['invariabile', 'difSing', 'difPlur', 'mobile'],
+    d: it => `Al plurale ha due forme: ${it.p}.`,
+    items: [
+      { w: 'braccio', p: '«i bracci» (di un fiume, di una gru) e «le braccia» (del corpo)' },
+      { w: 'ginocchio', p: '«i ginocchi» e «le ginocchia»' },
+      { w: 'dito', p: '«i diti» (presi uno per uno) e «le dita» (della mano, tutte insieme)' },
+      { w: 'osso', p: '«gli ossi» (es. gli ossi per il cane) e «le ossa» (dello scheletro)' },
+      { w: 'muro', p: '«i muri» (di una casa) e «le mura» (di una città)' },
+      { w: 'lenzuolo', p: '«i lenzuoli» (presi singolarmente) e «le lenzuola» (il paio del letto)' },
+      { w: 'labbro', p: '«i labbri» (di una ferita, di un vaso) e «le labbra» (della bocca)' },
+      { w: 'membro', p: '«i membri» (di un gruppo) e «le membra» (del corpo)' },
+      { w: 'urlo', p: '«gli urli» e «le urla»' },
+      { w: 'filo', p: '«i fili» (d’erba, elettrici) e «le fila» (di un discorso, di una storia)' },
+      { w: 'grido', p: '«i gridi» (degli animali) e «le grida» (delle persone)' },
+      { w: 'ciglio', p: '«i cigli» (della strada) e «le ciglia» (degli occhi)' }
+    ]
+  },
+  mobile: {
+    nome: 'nome mobile', label: 'Nome mobile', pl: 'Nomi mobili',
+    def: 'forma il femminile dalla stessa radice, cambiando la desinenza o aggiungendo un suffisso (-a, -essa, -trice, -ina…)',
+    conf: ['indipendente', 'comune', 'promiscuo', 'invariabile'],
+    d: it => `«${it.w}» → «${it.f}»: la radice è la stessa, cambia solo la parte finale.`,
+    items: [
+      { w: 'attore', f: 'attrice' }, { w: 'maestro', f: 'maestra' }, { w: 'leone', f: 'leonessa' },
+      { w: 'principe', f: 'principessa' }, { w: 'dottore', f: 'dottoressa' }, { w: 'cuoco', f: 'cuoca' },
+      { w: 'eroe', f: 'eroina' }, { w: 'pittore', f: 'pittrice' }, { w: 'gallo', f: 'gallina' },
+      { w: 'scrittore', f: 'scrittrice' }, { w: 'studente', f: 'studentessa' }, { w: 'conte', f: 'contessa' },
+      { w: 'lupo', f: 'lupa' }, { w: 'imperatore', f: 'imperatrice' }
+    ]
+  },
+  indipendente: {
+    nome: 'nome indipendente', label: 'Nome indipendente', pl: 'Nomi indipendenti',
+    def: 'usa due parole completamente diverse (con radici diverse) per il maschile e per il femminile',
+    conf: ['mobile', 'promiscuo', 'comune', 'sovrabbondante'],
+    d: it => `«${it.w}» → «${it.f}»: sono due parole completamente diverse.`,
+    items: [
+      { w: 'padre', f: 'madre' }, { w: 'uomo', f: 'donna' }, { w: 'fratello', f: 'sorella' },
+      { w: 'marito', f: 'moglie' }, { w: 'genero', f: 'nuora' }, { w: 'montone', f: 'pecora' },
+      { w: 'toro', f: 'vacca' }, { w: 'frate', f: 'suora' }
+    ]
+  },
+  invariabile: {
+    nome: 'nome invariabile', label: 'Nome invariabile', pl: 'Nomi invariabili',
+    def: 'ha la stessa forma al singolare e al plurale: cambia solo l’articolo',
+    conf: ['difPlur', 'difSing', 'sovrabbondante', 'comune'],
+    d: it => `Singolare «${it.s}», plurale «${it.pl}»: la parola non cambia.`,
+    items: [
+      { w: 'tesi', s: 'la tesi', pl: 'le tesi' }, { w: 'analisi', s: 'l’analisi', pl: 'le analisi' },
+      { w: 'virtù', s: 'la virtù', pl: 'le virtù' }, { w: 'caffè', s: 'il caffè', pl: 'i caffè' },
+      { w: 'sport', s: 'lo sport', pl: 'gli sport' }, { w: 'film', s: 'il film', pl: 'i film' },
+      { w: 'foto', s: 'la foto', pl: 'le foto' }, { w: 'radio', s: 'la radio', pl: 'le radio' },
+      { w: 'università', s: 'l’università', pl: 'le università' }, { w: 'metropoli', s: 'la metropoli', pl: 'le metropoli' },
+      { w: 'bar', s: 'il bar', pl: 'i bar' }, { w: 'oasi', s: 'l’oasi', pl: 'le oasi' }, { w: 'auto', s: 'l’auto', pl: 'le auto' }
+    ]
+  },
+  difSing: {
+    nome: 'nome difettivo del singolare', label: 'Nome difettivo del singolare', pl: 'Nomi difettivi del singolare',
+    def: '<b>non ha il singolare</b> e si usa solo al plurale',
+    conf: ['difPlur', 'invariabile', 'sovrabbondante', 'promiscuo'],
+    d: it => `Si dice soltanto «${it.pl}».`,
+    items: [
+      { w: 'occhiali', pl: 'gli occhiali' }, { w: 'pantaloni', pl: 'i pantaloni' }, { w: 'nozze', pl: 'le nozze' },
+      { w: 'viveri', pl: 'i viveri' }, { w: 'dintorni', pl: 'i dintorni' }, { w: 'stoviglie', pl: 'le stoviglie' },
+      { w: 'ferie', pl: 'le ferie' }, { w: 'manette', pl: 'le manette' },
+      { w: 'mutande', pl: 'le mutande' }
+    ]
+  },
+  difPlur: {
+    nome: 'nome difettivo del plurale', label: 'Nome difettivo del plurale', pl: 'Nomi difettivi del plurale',
+    def: '<b>non ha il plurale</b> e si usa solo al singolare',
+    conf: ['difSing', 'invariabile', 'sovrabbondante', 'promiscuo'],
+    d: it => `Si dice soltanto «${it.s}».`,
+    items: [
+      { w: 'fame', s: 'la fame' }, { w: 'sangue', s: 'il sangue' }, { w: 'pepe', s: 'il pepe' },
+      { w: 'miele', s: 'il miele' }, { w: 'coraggio', s: 'il coraggio' }, { w: 'prole', s: 'la prole' },
+      { w: 'senape', s: 'la senape' }, { w: 'pazienza', s: 'la pazienza' }
+    ]
+  },
+  comune: {
+    nome: 'nome di genere comune', label: 'Nome di genere comune', pl: 'Nomi di genere comune',
+    def: 'ha una sola forma per il maschile e il femminile: cambia solo l’articolo',
+    conf: ['promiscuo', 'mobile', 'indipendente', 'invariabile'],
+    d: it => `Si dice «${it.mf}».`,
+    items: [
+      { w: 'cantante', mf: 'il cantante / la cantante' }, { w: 'giornalista', mf: 'il giornalista / la giornalista' },
+      { w: 'collega', mf: 'il collega / la collega' }, { w: 'preside', mf: 'il preside / la preside' },
+      { w: 'testimone', mf: 'il testimone / la testimone' }, { w: 'atleta', mf: 'un atleta / un’atleta' },
+      { w: 'pianista', mf: 'il pianista / la pianista' }, { w: 'turista', mf: 'il turista / la turista' },
+      { w: 'parente', mf: 'il parente / la parente' }, { w: 'dentista', mf: 'il dentista / la dentista' },
+      { w: 'insegnante', mf: 'un insegnante / un’insegnante' }, { w: 'custode', mf: 'il custode / la custode' }
+    ]
+  }
+};
+const CAT_KEYS = Object.keys(CATS);
+
+function explainItem(k, it) {
+  const c = CATS[k];
+  return `«${it.w}» è un <b>${c.nome}</b>: ${c.def}. ${c.d(it)}`;
+}
+
+function distractorCats(k) {
+  const conf = CATS[k].conf;
+  return [conf[0], ...sample(conf.slice(1), 2)];
+}
+
+/* Ogni domanda: {text, options:[{html, cat, item}], answer:index, explain, kind} */
+function makeQuestion(k, used) {
+  const c = CATS[k];
+  const fresh = c.items.filter(i => !used.has(i.w));
+  const pool = fresh.length >= 3 ? fresh : c.items;
+  const kinds = ['A', 'B', 'D'];
+  if (k === 'mobile' || k === 'indipendente') kinds.push('C', 'C');
+  const kind = pick(kinds);
+
+  if (kind === 'A') { // Il nome X è un esempio di…
+    const it = pick(pool); used.add(it.w);
+    const opts = shuffle([k, ...distractorCats(k)]).map(ck => ({ html: CATS[ck].label, cat: ck }));
+    return { kind, text: `Il nome <q>${it.w}</q> è un esempio di:`, options: opts, answer: opts.findIndex(o => o.cat === k), it, k };
+  }
+  if (kind === 'B') { // Quale tra questi è un nome X?
+    const it = pick(pool); used.add(it.w);
+    const others = distractorCats(k).map(ck => ({ cat: ck, item: pick(CATS[ck].items) }));
+    const opts = shuffle([{ cat: k, item: it }, ...others]).map(o => ({ html: o.item.w.charAt(0).toUpperCase() + o.item.w.slice(1), cat: o.cat, item: o.item }));
+    return { kind, text: `Quale tra i seguenti nomi è un tipico esempio di <b>${c.nome}</b>?`, options: opts, answer: opts.findIndex(o => o.cat === k), it, k };
+  }
+  if (kind === 'C') { // X al femminile diventa Y
+    const it = pick(pool); used.add(it.w);
+    const opts = shuffle(['mobile', 'indipendente', 'comune', 'promiscuo']).map(ck => ({ html: CATS[ck].pl, cat: ck }));
+    return { kind, text: `Il nome <q>${it.w}</q> al femminile diventa <q>${it.f}</q>. Questa è una caratteristica dei:`, options: opts, answer: opts.findIndex(o => o.cat === k), it, k };
+  }
+  // D: parole come a, b, c appartengono ai…
+  const three = sample(pool, 3); three.forEach(i => used.add(i.w));
+  const opts = shuffle([k, ...distractorCats(k)]).map(ck => ({ html: CATS[ck].pl, cat: ck }));
+  return { kind, text: `Parole come <q>${three[0].w}</q>, <q>${three[1].w}</q> e <q>${three[2].w}</q> appartengono alla categoria dei:`, options: opts, answer: opts.findIndex(o => o.cat === k), it: three[0], group: three, k };
+}
+
+function questionExplanation(q) {
+  const c = CATS[q.k];
+  if (q.kind === 'D') {
+    return `Sono tutti <b>${c.pl.toLowerCase()}</b>: un ${c.nome} ${c.def}. ` + q.group.map(i => c.d(i)).join(' ');
+  }
+  return explainItem(q.k, q.it);
+}
+
+function whyNot(q, chosen) {
+  const o = q.options[chosen];
+  const c = CATS[o.cat];
+  if (q.kind === 'B') return `Hai scelto «${o.item.w}»: questo invece è un <b>${c.nome}</b>. ${c.d(o.item)}`;
+  return `Hai scelto «${o.html}»: un ${c.nome} ${c.def}. Non è il caso di questa domanda.`;
+}
+
+const QUIZ_LEN = 8;
+let quiz;
+function newQuiz() {
+  const used = new Set();
+  const cats = shuffle(CAT_KEYS).slice(0, QUIZ_LEN);
+  while (cats.length < QUIZ_LEN) cats.push(pick(CAT_KEYS));
+  quiz = { qs: cats.map(k => makeQuestion(k, used)), i: 0, res: [] };
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const box = $('#quiz');
+  const dots = quiz.qs.map((_, j) => `<i class="${quiz.res[j] === true ? 'ok' : quiz.res[j] === false ? 'ko' : j === quiz.i ? 'cur' : ''}"></i>`).join('');
+  if (quiz.i >= quiz.qs.length) {
+    const ok = quiz.res.filter(Boolean).length;
+    box.innerHTML = `<div class="progress">${dots}</div>
+      <div class="result show"><b>Hai risposto bene a ${ok} ${ok === 1 ? 'domanda' : 'domande'} su ${quiz.qs.length}.</b><p>${praise(ok, quiz.qs.length)}</p></div>
+      <div class="actions"><button class="btn" id="qNew">🔄 Nuove domande</button></div>`;
+    $('#qNew').onclick = newQuiz;
+    return;
+  }
+  const q = quiz.qs[quiz.i];
+  box.innerHTML = `<div class="progress">${dots}</div>
+    <div class="qcount">Domanda ${quiz.i + 1} di ${quiz.qs.length}</div>
+    <p class="question">${q.text}</p>
+    <div class="opts">${q.options.map((o, j) => `<button class="opt" data-j="${j}"><span class="L">${'ABCD'[j]}</span><span>${o.html}</span></button>`).join('')}</div>
+    <div id="qfb"></div>
+    <div class="actions"><button class="btn" id="qNext" hidden>Avanti →</button><button class="btn soft" id="qRestart">🔄 Ricomincia con nuove domande</button></div>`;
+  box.querySelectorAll('.opt').forEach(b => b.onclick = () => answerQuiz(+b.dataset.j));
+  $('#qNext').onclick = () => {
+    quiz.i++; renderQuiz();
+    const top = box.getBoundingClientRect().top;
+    if (top < 0) window.scrollBy({ top: top - $('nav.tabs').offsetHeight - 8, behavior: 'smooth' });
+  };
+  $('#qRestart').onclick = newQuiz;
+}
+
+function answerQuiz(j) {
+  const q = quiz.qs[quiz.i];
+  const ok = j === q.answer;
+  quiz.res[quiz.i] = ok;
+  addScore(ok ? 1 : 0, 1);
+  document.querySelectorAll('#quiz .opt').forEach((b, x) => {
+    b.disabled = true;
+    if (x === q.answer) b.classList.add('right');
+    else if (x === j) b.classList.add('wrong');
+  });
+  const right = q.options[q.answer].html;
+  $('#qfb').innerHTML = ok
+    ? `<div class="fb ok"><p class="head">✔ Esatto!</p><p>${questionExplanation(q)}</p></div>`
+    : `<div class="fb ko"><p class="head">✘ Non è corretto. La risposta giusta è: ${right}</p>
+         <p><b>Perché?</b> ${questionExplanation(q)}</p>
+         <div class="whynot">${whyNot(q, j)}</div></div>`;
+  const next = $('#qNext');
+  next.hidden = false;
+  if (quiz.i === quiz.qs.length - 1) next.textContent = 'Vedi il risultato →';
+  next.focus({ preventScroll: true });
+  next.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  // aggiorna i pallini
+  document.querySelectorAll('#quiz .progress i')[quiz.i].className = ok ? 'ok' : 'ko';
+}
+
+/* =========================================================
+   ESERCIZI A RIGHE (2, 3, 4) — motore comune
+   ========================================================= */
+function rowExercise(cfg) {
+  // cfg: {el, opts:[{k,label,def}], makeItems:()=>[{w,cat,exp}]}
+  const el = $(cfg.el);
+  let items, answers, checked;
+  function start() {
+    items = cfg.makeItems(); answers = {}; checked = false;
+    el.innerHTML = `<div class="rows">${items.map((it, i) => `
+      <div class="row" data-i="${i}">
+        <div class="top"><span class="word">${esc(it.w)}</span>
+          <div class="pills">${cfg.opts.map(o => `<button class="pill" data-k="${o.k}">${o.label}</button>`).join('')}</div>
+        </div>
+        <div class="exp"></div>
+      </div>`).join('')}</div>
+      <div class="result"></div>
+      <div class="actions"><button class="btn chk" disabled>✔ Controlla</button><button class="btn soft nw">🔄 Nuovi esempi</button></div>`;
+    el.querySelectorAll('.row').forEach(row => {
+      const i = +row.dataset.i;
+      row.querySelectorAll('.pill').forEach(p => p.onclick = () => {
+        if (checked) return;
+        answers[i] = p.dataset.k;
+        row.querySelectorAll('.pill').forEach(x => x.classList.toggle('sel', x === p));
+        $('.chk', el).disabled = Object.keys(answers).length < items.length;
+      });
+    });
+    $('.chk', el).onclick = check;
+    $('.nw', el).onclick = start;
+  }
+  function check() {
+    checked = true;
+    let ok = 0;
+    el.querySelectorAll('.row').forEach(row => {
+      const i = +row.dataset.i, it = items[i], a = answers[i], good = a === it.cat;
+      if (good) ok++;
+      row.classList.add(good ? 'ok' : 'ko');
+      row.querySelectorAll('.pill').forEach(p => p.disabled = true);
+      const rightLabel = cfg.opts.find(o => o.k === it.cat).label;
+      const chosen = cfg.opts.find(o => o.k === a);
+      row.querySelector('.exp').innerHTML = good
+        ? `<span class="badge ok">GIUSTO</span>${it.exp}`
+        : `<span class="badge ko">SBAGLIATO</span>La risposta giusta è <b>${rightLabel}</b>. ${it.exp}
+           <div class="whynot">Hai scelto «${chosen.label}», ma ${chosen.def}: non è il caso di «${esc(it.w)}».</div>`;
+    });
+    addScore(ok, items.length);
+    const r = $('.result', el);
+    r.classList.add('show');
+    r.innerHTML = `<b>Risultato: ${ok} su ${items.length}</b><p>${praise(ok, items.length)}</p>`;
+    $('.chk', el).disabled = true;
+    r.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  start();
+}
+
+/* ---------- 2. Composti / collettivi / comuni ---------- */
+const COMPOSTI = [
+  ['cavolfiore', 'cavolo', 'fiore'], ['pescespada', 'pesce', 'spada'], ['apriscatole', 'apri', 'scatole'],
+  ['arcobaleno', 'arco', 'baleno'], ['portafoglio', 'porta', 'foglio'], ['francobollo', 'franco', 'bollo'],
+  ['girasole', 'gira', 'sole'], ['capoluogo', 'capo', 'luogo'], ['asciugamano', 'asciuga', 'mano'],
+  ['grattacielo', 'gratta', 'cielo'], ['cassaforte', 'cassa', 'forte'], ['ferrovia', 'ferro', 'via'],
+  ['salvagente', 'salva', 'gente'], ['schiaccianoci', 'schiaccia', 'noci'], ['portaombrelli', 'porta', 'ombrelli'],
+  ['cacciavite', 'caccia', 'vite'], ['pianoforte', 'piano', 'forte'], ['lavastoviglie', 'lava', 'stoviglie']
+];
+const COLLETTIVI = [
+  ['gregge', 'pecore'], ['flotta', 'navi'], ['folla', 'persone'], ['sciame', 'api o altri insetti'],
+  ['mandria', 'buoi o cavalli'], ['stormo', 'uccelli'], ['esercito', 'soldati'], ['squadra', 'giocatori'],
+  ['pineta', 'pini'], ['costellazione', 'stelle'], ['branco', 'animali (per esempio lupi)'], ['fogliame', 'foglie'],
+  ['scolaresca', 'scolari'], ['equipaggio', 'persone che lavorano su una nave o un aereo'], ['bosco', 'alberi'],
+  ['coro', 'cantanti'], ['popolo', 'persone della stessa nazione']
+];
+const COMUNI = CATS.comune.items.concat([{ w: 'interprete', mf: 'l’interprete (lui) / l’interprete (lei)' }, { w: 'artista', mf: 'un artista / un’artista' }]);
+
+rowExercise({
+  el: '#ex2',
+  opts: [
+    { k: 'comp', label: 'Composto', def: 'un nome composto è formato dall’unione di due parole' },
+    { k: 'coll', label: 'Collettivo', def: 'un nome collettivo, pur essendo singolare, indica un gruppo di persone, animali o cose' },
+    { k: 'com', label: 'Di genere comune', def: 'un nome di genere comune ha la stessa forma per maschile e femminile e cambia solo l’articolo' }
+  ],
+  makeItems: () => shuffle([
+    ...sample(COMPOSTI, 2).map(([w, a, b]) => ({ w, cat: 'comp', exp: `«${w}» è un <b>nome composto</b>: è formato da due parole unite, «${a}» + «${b}».` })),
+    ...sample(COLLETTIVI, 2).map(([w, g]) => ({ w, cat: 'coll', exp: `«${w}» è un <b>nome collettivo</b>: anche se è al singolare, indica un gruppo di ${g}.` })),
+    ...sample(COMUNI, 2).map(it => ({ w: it.w, cat: 'com', exp: `«${it.w}» è un <b>nome di genere comune</b>: ha la stessa forma al maschile e al femminile, cambia solo l’articolo (${it.mf}).` }))
+  ])
+});
+
+/* ---------- 3. Primitivi / derivati ---------- */
+const DERIVATI = [
+  ['giornalaio', 'giornale', '-aio'], ['fioraio', 'fiore', '-aio'],
+  ['libreria', 'libro', '-eria'], ['pescheria', 'pesce', '-eria'], ['dentista', 'dente', '-ista'],
+  ['lattaio', 'latte', '-aio'], ['benzinaio', 'benzina', '-aio'], ['pizzeria', 'pizza', '-eria'],
+  ['giardiniere', 'giardino', '-iere'], ['birreria', 'birra', '-eria'], ['tabaccheria', 'tabacco', '-eria'],
+  ['gioielliere', 'gioiello', '-iere'], ['cucchiaiata', 'cucchiaio', '-ata'], ['ombrellaio', 'ombrello', '-aio'],
+  ['panificio', 'pane', '-ificio'], ['barista', 'bar', '-ista'], ['fiorista', 'fiore', '-ista'],
+  ['gelataio', 'gelato', '-aio']];
+const PRIMITIVI = [
+  ['mare', 'marinaio'], ['libro', 'libraio'], ['pane', 'panettiere'],
+  ['casa', 'casalinga'], ['fiore', 'fioraio'], ['latte', 'latteria'],
+  ['sasso', 'sassaiola'], ['vino', 'vinaio'], ['carta', 'cartolaio'], ['barca', 'barcaiolo'],
+  ['dente', 'dentista'], ['scuola', 'scolaro'], ['vento', 'ventata'], ['ferro', 'ferriera'],
+  ['sale', 'saliera'], ['zucchero', 'zuccheriera'], ['orologio', 'orologiaio'], ['porta', 'portiere']
+];
+
+rowExercise({
+  el: '#ex3',
+  opts: [
+    { k: 'pri', label: 'Primitivo', def: 'un nome primitivo non deriva da nessun’altra parola' },
+    { k: 'der', label: 'Derivato', def: 'un nome derivato nasce da un’altra parola a cui si aggiunge un suffisso' }
+  ],
+  makeItems: () => {
+    const nd = 2 + Math.floor(Math.random() * 3); // da 2 a 4 derivati
+    const ders = sample(DERIVATI, nd);
+    const roots = new Set(ders.map(d => d[1]));
+    const pris = sample(PRIMITIVI.filter(p => !roots.has(p[0])), 6 - nd);
+    return shuffle([
+      ...ders.map(([w, r, s]) => ({ w, cat: 'der', exp: `«${w}» è un <b>nome derivato</b>: nasce da «${r}» con l’aggiunta del suffisso <b>${s}</b>.` })),
+      ...pris.map(([w, ex]) => ({ w, cat: 'pri', exp: `«${w}» è un <b>nome primitivo</b>: non deriva da un’altra parola, anzi è la base da cui nascono altri nomi (per esempio «${ex}»).` }))
+    ]);
+  }
+});
+
+/* ---------- 4. Falsi alterati ---------- */
+const FALSI = [
+  ['pulcino', 'piccola pulce', 'il piccolo della gallina'], ['nasello', 'piccolo naso', 'un pesce'],
+  ['mattone', 'grande matto', 'un blocco di argilla usato per costruire'], ['bottone', 'grande botte', 'un oggetto che serve a chiudere i vestiti'],
+  ['burrone', 'grande burro', 'un precipizio'], ['lampone', 'grande lampo', 'un frutto di bosco'],
+  ['tacchino', 'piccolo tacco', 'un animale da cortile'], ['focaccia', 'brutta foca', 'un tipo di pane'],
+  ['cerotto', 'piccolo cero', 'una striscia che si mette sulle ferite'], ['rubinetto', 'piccolo rubino', 'il dispositivo da cui esce l’acqua'],
+  ['mulino', 'piccolo mulo', 'l’edificio dove si macina il grano'], ['collina', 'piccola colla', 'un rilievo del terreno'],
+  ['limone', 'grande lima', 'un agrume'], ['visone', 'grande viso', 'un animale dalla pelliccia pregiata'],
+  ['torrone', 'grande torre', 'un dolce di mandorle e miele'], ['merluzzo', 'brutto merlo', 'un pesce'],
+  ['bottino', 'piccola botte', 'ciò che si ruba o si conquista']
+];
+const VERI = [
+  ['gattino', 'gatto', 'diminutivo', 'piccolo gatto'], ['casetta', 'casa', 'diminutivo', 'piccola casa'],
+  ['ragazzaccio', 'ragazzo', 'dispregiativo', 'ragazzo cattivo'], ['nasone', 'naso', 'accrescitivo', 'naso grande'],
+  ['cagnolino', 'cane', 'diminutivo/vezzeggiativo', 'piccolo cane'], ['venticello', 'vento', 'diminutivo', 'vento leggero'],
+  ['omone', 'uomo', 'accrescitivo', 'uomo grande e grosso'], ['fiorellino', 'fiore', 'diminutivo', 'piccolo fiore'],
+  ['tempaccio', 'tempo', 'dispregiativo', 'brutto tempo'], ['sassolino', 'sasso', 'diminutivo', 'piccolo sasso'],
+  ['paesino', 'paese', 'diminutivo', 'piccolo paese'], ['febbrone', 'febbre', 'accrescitivo', 'febbre molto alta'],
+  ['librone', 'libro', 'accrescitivo', 'libro grande'], ['giornataccia', 'giornata', 'dispregiativo', 'brutta giornata'],
+  ['orsacchiotto', 'orso', 'vezzeggiativo', 'piccolo orso tenero'], ['fratellino', 'fratello', 'diminutivo/vezzeggiativo', 'fratello piccolo'],
+  ['lettino', 'letto', 'diminutivo', 'piccolo letto']];
+
+rowExercise({
+  el: '#ex4',
+  opts: [
+    { k: 'vero', label: 'Vero alterato', def: 'un vero alterato cambia il nome di partenza solo nella grandezza o nel giudizio (piccolo, grande, brutto, carino)' },
+    { k: 'falso', label: 'Falso alterato', def: 'un falso alterato ha solo la terminazione di un alterato, ma un significato completamente diverso' }
+  ],
+  makeItems: () => {
+    const nf = 3 + Math.floor(Math.random() * 2); // 3 o 4 falsi alterati
+    return shuffle([
+      ...sample(FALSI, nf).map(([w, sembra, e]) => ({ w, cat: 'falso', exp: `«${w}» è un <b>falso alterato</b>: sembra voler dire «${sembra}», ma in realtà è ${e}.` })),
+      ...sample(VERI, 6 - nf).map(([w, base, tipo, sign]) => ({ w, cat: 'vero', exp: `«${w}» è un <b>vero alterato</b> (${tipo}) di «${base}»: significa proprio «${sign}».` }))
+    ]);
+  }
+});
+
+/* =========================================================
+   5. ANALISI GRAMMATICALE
+   ========================================================= */
+const PARTS = {
+  art: { label: 'Articolo', def: 'l’articolo sta davanti al nome e ne indica genere e numero' },
+  nome: { label: 'Nome', def: 'il nome indica persone, animali, cose o idee' },
+  agg: { label: 'Aggettivo', def: 'l’aggettivo accompagna un nome per descriverlo o precisarlo' },
+  pron: { label: 'Pronome', def: 'il pronome sostituisce un nome (non lo accompagna)' },
+  verbo: { label: 'Verbo', def: 'il verbo indica un’azione, uno stato o un modo di essere' },
+  avv: { label: 'Avverbio', def: 'l’avverbio modifica il significato di un verbo, di un aggettivo o di un altro avverbio' },
+  prep: { label: 'Preposizione', def: 'la preposizione collega le parole e precisa una relazione (di, a, da, in, con, su, per, tra, fra, anche unite all’articolo)' },
+  cong: { label: 'Congiunzione', def: 'la congiunzione unisce due parole o due frasi (e, ma, o, però…)' }
+};
+const PART_KEYS = Object.keys(PARTS);
+
+const T_POSS_AGG = n => `Accompagna il nome «${n}»: un possessivo vicino a un nome è un aggettivo.`;
+const T_POSS_PRON = n => `Qui non accompagna nessun nome: lo sostituisce (sta per «${n}»). Per questo è un pronome, non un aggettivo.`;
+const T_COMPOSTO = 'È un unico verbo formato da due parole (ausiliare + participio passato): è un tempo composto.';
+
+/* [parola, parte, analisi, suggerimento facoltativo]; punteggiatura finale in .end */
+const SENTENCES = [
+  { end: '.', t: [
+    ['La', 'art', 'articolo determinativo, femminile singolare'],
+    ['mia', 'agg', 'aggettivo possessivo, 1ª persona singolare, femminile singolare', T_POSS_AGG('bici')],
+    ['bici', 'nome', 'nome comune di cosa, concreto, femminile singolare (invariabile)'],
+    ['era', 'verbo', 'verbo essere, coniugazione propria, modo indicativo, tempo imperfetto, 3ª persona singolare'],
+    ['nuova', 'agg', 'aggettivo qualificativo, femminile singolare, grado positivo'],
+    ['ma', 'cong', 'congiunzione avversativa', '«Ma» unisce due parti della frase e indica un contrasto.'],
+    ['non', 'avv', 'avverbio di negazione'],
+    ['la', 'art', 'articolo determinativo, femminile singolare'],
+    ['tua', 'pron', 'pronome possessivo, 2ª persona singolare, femminile singolare', T_POSS_PRON('tua bici')]
+  ]},
+  { end: '.', t: [
+    ['Il', 'art', 'articolo determinativo, maschile singolare'],
+    ['suo', 'agg', 'aggettivo possessivo, 3ª persona singolare, maschile singolare', T_POSS_AGG('cane')],
+    ['cane', 'nome', 'nome comune di animale, concreto, maschile singolare'],
+    ['è', 'verbo', 'verbo essere, coniugazione propria, modo indicativo, tempo presente, 3ª persona singolare', 'Attenzione all’accento: «è» con l’accento è il verbo essere; «e» senza accento è una congiunzione.'],
+    ['vivace', 'agg', 'aggettivo qualificativo, maschile singolare, grado positivo'],
+    ['ma', 'cong', 'congiunzione avversativa'],
+    ['non', 'avv', 'avverbio di negazione'],
+    ['il', 'art', 'articolo determinativo, maschile singolare'],
+    ['mio', 'pron', 'pronome possessivo, 1ª persona singolare, maschile singolare', T_POSS_PRON('mio cane')]
+  ]},
+  { end: '.', t: [
+    ['La', 'art', 'articolo determinativo, femminile singolare'],
+    ['vostra', 'agg', 'aggettivo possessivo, 2ª persona plurale, femminile singolare', T_POSS_AGG('casa')],
+    ['casa', 'nome', 'nome comune di cosa, concreto, femminile singolare'],
+    ['era', 'verbo', 'verbo essere, coniugazione propria, modo indicativo, tempo imperfetto, 3ª persona singolare'],
+    ['grande', 'agg', 'aggettivo qualificativo, femminile singolare, grado positivo'],
+    ['ma', 'cong', 'congiunzione avversativa'],
+    ['non', 'avv', 'avverbio di negazione'],
+    ['la', 'art', 'articolo determinativo, femminile singolare'],
+    ['nostra', 'pron', 'pronome possessivo, 1ª persona plurale, femminile singolare', T_POSS_PRON('nostra casa')]
+  ]},
+  { end: '.', t: [
+    ['Le', 'art', 'articolo determinativo, femminile plurale'],
+    ['tue', 'agg', 'aggettivo possessivo, 2ª persona singolare, femminile plurale', T_POSS_AGG('scarpe')],
+    ['scarpe', 'nome', 'nome comune di cosa, concreto, femminile plurale'],
+    ['erano', 'verbo', 'verbo essere, coniugazione propria, modo indicativo, tempo imperfetto, 3ª persona plurale'],
+    ['sporche', 'agg', 'aggettivo qualificativo, femminile plurale, grado positivo'],
+    ['e', 'cong', 'congiunzione copulativa', '«e» senza accento unisce due parti della frase: è una congiunzione.'],
+    ['le', 'art', 'articolo determinativo, femminile plurale'],
+    ['mie', 'pron', 'pronome possessivo, 1ª persona singolare, femminile plurale', T_POSS_PRON('mie scarpe')],
+    ['no', 'avv', 'avverbio di negazione']
+  ]},
+  { end: '.', t: [
+    ['Ho letto', 'verbo', 'verbo leggere, 2ª coniugazione, modo indicativo, tempo passato prossimo, 1ª persona singolare', T_COMPOSTO],
+    ['questo', 'agg', 'aggettivo dimostrativo, maschile singolare', 'Accompagna il nome «libro»: è un aggettivo dimostrativo.'],
+    ['libro', 'nome', 'nome comune di cosa, concreto, maschile singolare'],
+    ['avventuroso', 'agg', 'aggettivo qualificativo, maschile singolare, grado positivo'],
+    ['molte', 'agg', 'aggettivo indefinito, femminile plurale', 'Indica una quantità non precisa e accompagna il nome «volte»: è un aggettivo indefinito.'],
+    ['volte', 'nome', 'nome comune di cosa, astratto, femminile plurale']
+  ]},
+  { end: '.', t: [
+    ['Abbiamo visto', 'verbo', 'verbo vedere, 2ª coniugazione, modo indicativo, tempo passato prossimo, 1ª persona plurale', T_COMPOSTO],
+    ['quel', 'agg', 'aggettivo dimostrativo, maschile singolare', 'Accompagna il nome «film»: è un aggettivo dimostrativo.'],
+    ['film', 'nome', 'nome comune di cosa, concreto, maschile singolare (invariabile)'],
+    ['comico', 'agg', 'aggettivo qualificativo, maschile singolare, grado positivo'],
+    ['tante', 'agg', 'aggettivo indefinito, femminile plurale', 'Indica una quantità non precisa e accompagna il nome «volte».'],
+    ['volte', 'nome', 'nome comune di cosa, astratto, femminile plurale']
+  ]},
+  { end: '.', t: [
+    ['Marco', 'nome', 'nome proprio di persona, maschile singolare'],
+    ['ha ascoltato', 'verbo', 'verbo ascoltare, 1ª coniugazione, modo indicativo, tempo passato prossimo, 3ª persona singolare', T_COMPOSTO],
+    ['quella', 'agg', 'aggettivo dimostrativo, femminile singolare', 'Accompagna il nome «canzone»: è un aggettivo dimostrativo.'],
+    ['canzone', 'nome', 'nome comune di cosa, concreto, femminile singolare'],
+    ['allegra', 'agg', 'aggettivo qualificativo, femminile singolare, grado positivo'],
+    ['poche', 'agg', 'aggettivo indefinito, femminile plurale', 'Indica una quantità non precisa e accompagna il nome «volte».'],
+    ['volte', 'nome', 'nome comune di cosa, astratto, femminile plurale']
+  ]},
+  { end: '.', t: [
+    ['Questo', 'agg', 'aggettivo dimostrativo, maschile singolare', 'Accompagna il nome «zaino»: è un aggettivo.'],
+    ['zaino', 'nome', 'nome comune di cosa, concreto, maschile singolare'],
+    ['è', 'verbo', 'verbo essere, coniugazione propria, modo indicativo, tempo presente, 3ª persona singolare'],
+    ['pesante', 'agg', 'aggettivo qualificativo, maschile singolare, grado positivo'],
+    ['ma', 'cong', 'congiunzione avversativa'],
+    ['quello', 'pron', 'pronome dimostrativo, maschile singolare', 'Non accompagna un nome: lo sostituisce (sta per «quello zaino», cioè al posto del nome «zaino»). È un pronome.'],
+    ['è', 'verbo', 'verbo essere, coniugazione propria, modo indicativo, tempo presente, 3ª persona singolare'],
+    ['leggero', 'agg', 'aggettivo qualificativo, maschile singolare, grado positivo']
+  ]},
+  { end: '.', t: [
+    ['I', 'art', 'articolo determinativo, maschile plurale'],
+    ['miei', 'agg', 'aggettivo possessivo, 1ª persona singolare, maschile plurale', T_POSS_AGG('nonni')],
+    ['nonni', 'nome', 'nome comune di persona, concreto, maschile plurale'],
+    ['abitano', 'verbo', 'verbo abitare, 1ª coniugazione, modo indicativo, tempo presente, 3ª persona plurale'],
+    ['in', 'prep', 'preposizione semplice'],
+    ['una', 'art', 'articolo indeterminativo, femminile singolare'],
+    ['città', 'nome', 'nome comune di cosa, concreto, femminile singolare (invariabile)'],
+    ['tranquilla', 'agg', 'aggettivo qualificativo, femminile singolare, grado positivo']
+  ]},
+  { end: '.', t: [
+    ['Ieri', 'avv', 'avverbio di tempo', 'Dice «quando» avviene l’azione: è un avverbio di tempo.'],
+    ['abbiamo mangiato', 'verbo', 'verbo mangiare, 1ª coniugazione, modo indicativo, tempo passato prossimo, 1ª persona plurale', T_COMPOSTO],
+    ['una', 'art', 'articolo indeterminativo, femminile singolare'],
+    ['pizza', 'nome', 'nome comune di cosa, concreto, femminile singolare'],
+    ['buonissima', 'agg', 'aggettivo qualificativo, femminile singolare, grado superlativo assoluto', '«-issima» indica il grado superlativo assoluto dell’aggettivo «buono».']
+  ]},
+  { end: '.', t: [
+    ['Il', 'art', 'articolo determinativo, maschile singolare'],
+    ['gatto', 'nome', 'nome comune di animale, concreto, maschile singolare'],
+    ['della', 'prep', 'preposizione articolata (di + la)', '«della» = preposizione «di» + articolo «la»: è una preposizione articolata.'],
+    ['vicina', 'nome', 'nome comune di persona, concreto, femminile singolare', 'Qui «vicina» indica una persona (la signora che abita accanto): è un nome.'],
+    ['dorme', 'verbo', 'verbo dormire, 3ª coniugazione, modo indicativo, tempo presente, 3ª persona singolare'],
+    ['sempre', 'avv', 'avverbio di tempo'],
+    ['sul', 'prep', 'preposizione articolata (su + il)', '«sul» = preposizione «su» + articolo «il».'],
+    ['divano', 'nome', 'nome comune di cosa, concreto, maschile singolare']
+  ]},
+  { end: '.', t: [
+    ['Il', 'art', 'articolo determinativo, maschile singolare'],
+    ['nostro', 'agg', 'aggettivo possessivo, 1ª persona plurale, maschile singolare', T_POSS_AGG('coro')],
+    ['coro', 'nome', 'nome comune di persona, collettivo, maschile singolare'],
+    ['ha cantato', 'verbo', 'verbo cantare, 1ª coniugazione, modo indicativo, tempo passato prossimo, 3ª persona singolare', T_COMPOSTO],
+    ['questa', 'agg', 'aggettivo dimostrativo, femminile singolare', 'Accompagna il nome «canzone»: è un aggettivo dimostrativo.'],
+    ['canzone', 'nome', 'nome comune di cosa, concreto, femminile singolare'],
+    ['molte', 'agg', 'aggettivo indefinito, femminile plurale'],
+    ['volte', 'nome', 'nome comune di cosa, astratto, femminile plurale']
+  ]}
+];
+
+function renderAnalisi() {
+  const el = $('#ex5');
+  const sents = sample(SENTENCES, 2);
+  el.innerHTML = sents.map((s, si) => `
+    <div class="sentence" data-s="${si}">
+      <div class="text">${si + 1}. ${s.t.map(x => esc(x[0])).join(' ')}${s.end}</div>
+      <div class="tokens">${s.t.map((x, ti) => `
+        <div class="tok" data-t="${ti}"><span class="w">${esc(x[0])}</span>
+          <select aria-label="Parte del discorso di ${esc(x[0])}">
+            <option value="">— scegli —</option>
+            ${PART_KEYS.map(k => `<option value="${k}">${PARTS[k].label}</option>`).join('')}
+          </select>
+        </div>`).join('')}</div>
+      <div class="anal"></div>
+    </div>`).join('') + `
+    <div class="result"></div>
+    <div class="actions"><button class="btn chk">✔ Controlla</button><button class="btn soft nw">🔄 Nuove frasi</button></div>`;
+
+  $('.nw', el).onclick = renderAnalisi;
+  $('.chk', el).onclick = () => {
+    const sel = [...el.querySelectorAll('select')];
+    const empty = sel.filter(s => !s.value);
+    if (empty.length) {
+      const r = $('.result', el);
+      r.classList.add('show');
+      r.innerHTML = `<b>${empty.length === 1 ? 'Manca' : 'Mancano'} ancora ${empty.length} ${empty.length === 1 ? 'parola' : 'parole'}.</b><p>Scegli una parte del discorso per ogni parola, poi premi di nuovo «Controlla».</p>`;
+      empty[0].focus();
+      return;
+    }
+    let ok = 0, tot = 0;
+    el.querySelectorAll('.sentence').forEach(sEl => {
+      const s = sents[+sEl.dataset.s];
+      const rows = [];
+      sEl.querySelectorAll('.tok').forEach(tEl => {
+        const [w, part, an, tip] = s.t[+tEl.dataset.t];
+        const sv = tEl.querySelector('select');
+        const chosen = sv.value, good = chosen === part;
+        tot++; if (good) ok++;
+        tEl.classList.add(good ? 'ok' : 'ko');
+        sv.disabled = true;
+        rows.push(`<tr class="${good ? '' : 'ko'}"><td>${good ? '✔' : '✘'} ${esc(w)}</td><td>${an}${good
+          ? (tip ? `<span class="tipok">💡 ${tip}</span>` : '')
+          : `<span class="tip">Hai scelto «${PARTS[chosen].label}», ma è un${part === 'prep' || part === 'cong' ? 'a' : ''} <b>${PARTS[part].label.toLowerCase()}</b>. ${tip || ('Ricorda: ' + PARTS[part].def + '.')}</span>`}</td></tr>`);
+      });
+      const a = sEl.querySelector('.anal');
+      a.classList.add('show');
+      a.innerHTML = `<table>${rows.join('')}</table>`;
+    });
+    addScore(ok, tot);
+    const r = $('.result', el);
+    r.classList.add('show');
+    r.innerHTML = `<b>Risultato: ${ok} ${ok === 1 ? 'parola giusta' : 'parole giuste'} su ${tot}</b><p>${praise(ok, tot)}</p>`;
+    $('.chk', el).disabled = true;
+  };
+}
+
+/* avvio */
+newQuiz();
+renderAnalisi();
+</script>
+</body>
+</html>
